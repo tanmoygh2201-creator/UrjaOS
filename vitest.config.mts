@@ -8,6 +8,9 @@ export default defineConfig({
     // Pure-function tests don't need module isolation; this avoids flaky
     // worker spawn crashes on slow Windows filesystems and speeds up runs.
     isolate: false,
+    // This machine's worker forks crash intermittently (exit 0xC0000409);
+    // sequential files are reliable and barely slower for this suite size.
+    fileParallelism: false,
   },
   resolve: {
     alias: {

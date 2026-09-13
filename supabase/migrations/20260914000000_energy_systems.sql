@@ -37,25 +37,7 @@ as $$
   );
 $$;
 
--- Ownership check for all tables that reference energy_systems.
-create or replace function public.can_access_system(p_system_id uuid)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (
-    select 1
-    from public.energy_systems s
-    where s.id = p_system_id
-      and (s.user_id = auth.uid() or public.is_admin())
-  );
-$$;
-
 revoke all on function public.is_admin() from anon;
-revoke all on function public.can_access_system(uuid) from anon;
-
 -- ── energy_systems ──────────────────────────────────────────────────────────
 
 create table if not exists public.energy_systems (
@@ -94,6 +76,27 @@ create table if not exists public.energy_systems (
 
 comment on table public.energy_systems is
   'Solar + battery + grid systems owned by users. Root of the data model.';
+
+-- Ownership check for all tables that reference energy_systems.
+-- Defined AFTER the table above on purpose: PostgreSQL validates SQL-language
+-- function bodies at CREATE time (check_function_bodies defaults to on), so a
+-- body referencing a not-yet-created table fails with 42P01.
+create or replace function public.can_access_system(p_system_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.energy_systems s
+    where s.id = p_system_id
+      and (s.user_id = auth.uid() or public.is_admin())
+  );
+$$;
+
+revoke all on function public.can_access_system(uuid) from anon;
 
 alter table public.energy_systems enable row level security;
 

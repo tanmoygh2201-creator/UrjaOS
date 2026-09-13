@@ -198,4 +198,48 @@ describe("urjaos database schema", () => {
       ).toBeGreaterThan(0);
     }
   });
+
+  it("creates SQL functions only after the tables their bodies reference", () => {
+    // check_function_bodies defaults to on: PostgreSQL validates SQL-language
+    // function bodies at CREATE time, so a body that queries a table created
+    // later fails the whole script with 42P01. This actually shipped once in
+    // can_access_system — this test is the regression guard.
+    const sql = allSql();
+    const tables = new Map<string, number>();
+    for (const m of sql.matchAll(/create table if not exists public\.(\w+)/g)) {
+      if (!tables.has(m[1])) tables.set(m[1], m.index ?? -1);
+    }
+    const functions = [
+      ...sql.matchAll(
+        /create or replace function public\.(\w+)[\s\S]{0,300}?language (sql|plpgsql)[\s\S]*?as \$\$([\s\S]*?)\$\$/g
+      ),
+    ];
+    expect(functions.length).toBeGreaterThanOrEqual(5);
+    for (const fn of functions) {
+      const [, name, language, body] = fn;
+      if (language !== "sql") continue; // plpgsql bodies are not validated at CREATE time
+      for (const ref of body.matchAll(/public\.(\w+)(?!\w*\s*\()/g)) {
+        const created = tables.get(ref[1]);
+        expect(
+          created,
+          `function ${name} references unknown table ${ref[1]}`
+        ).toBeDefined();
+        expect(
+          fn.index ?? -1,
+          `function ${name} references ${ref[1]} before it is created (42P01 at setup time)`
+        ).toBeGreaterThan(created ?? -2);
+      }
+    }
+  });
+
+  it("keeps supabase-setup.sql in sync with the migrations", () => {
+    const bundle = readFileSync(
+      join(process.cwd(), "supabase-setup.sql"),
+      "utf8"
+    );
+    const generated = readMigrations()
+      .map((m) => m.sql)
+      .join("");
+    expect(bundle).toContain(generated);
+  });
 });

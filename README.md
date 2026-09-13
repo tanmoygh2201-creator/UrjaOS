@@ -41,7 +41,7 @@ clearly labeled as recommendations/simulations.
 | Energy system CRUD (solar + battery + grid config) | ✅ Done |
 | Dashboard (KPIs, charts, energy flow) | ✅ Done |
 | Simulated IoT energy data (realistic patterns) | ✅ Done |
-| Analytics (cost, savings, utilization) | ✅ Phase 7 |
+| Analytics (ranges, utilization, cost breakdown) | ✅ Done |
 | Solar + consumption forecasting (with MAE/RMSE/MAPE) | ✅ Phase 8 |
 | Battery optimization engine (rule-based, constraint-safe) | ✅ Phase 9 |
 | AI Energy Copilot (context-grounded, server-side key) | ✅ Phase 10 |

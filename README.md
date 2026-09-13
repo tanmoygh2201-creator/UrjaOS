@@ -153,6 +153,37 @@ cp .env.example .env.local    # PowerShell: Copy-Item .env.example .env.local
    `supabase/migrations/`. Users can only read/write data belonging to their own
    `energy_systems`.
 
+### Database schema
+
+| Table | Purpose |
+| --- | --- |
+| `profiles` | App profile per auth user (auto-created by trigger; roles: user/admin/energy_manager) |
+| `energy_systems` | Solar + battery + grid configuration; root of the data model |
+| `solar_readings` | PV generation telemetry (kW, kWh, irradiance, temperature) |
+| `consumption_readings` | Load telemetry (kW, kWh) |
+| `battery_readings` | Battery state (SOC, SOH, voltage, current, temperature, power) |
+| `grid_readings` | Grid import/export with the tariff in effect |
+| `forecasts` | Predictions with actuals → MAE/RMSE/MAPE accuracy tracking |
+| `optimization_schedules` | Recommended hourly battery actions (simulation output) |
+| `alerts` | Anomaly alerts with five severity levels |
+| `bills` | User-entered utility bills for the analyzer |
+
+**Guarantees enforced by the migrations:**
+
+- **RLS on every table.** Child tables use a `can_access_system()` helper
+  (SECURITY DEFINER) so ownership checks never recurse through policies.
+- **Ownership is immutable.** Updates can never re-point a row's `user_id`.
+- **Deduplicated time series.** All readings are unique on
+  `(system_id, timestamp)` — safe for idempotent simulator upserts.
+- **Physics mirrored in SQL.** SOC ∈ [0,100], `min_soc < max_soc`, efficiencies
+  ∈ (0,1], non-negative powers/energy, and no simultaneous charge + discharge.
+- **Cascade deletes.** Removing a system removes all of its data.
+- **Indexed for time-series access:** `system_id` + `timestamp` on every
+  reading table, partial indexes for unresolved alerts and pending actuals.
+
+These guarantees are enforced in CI by `tests/schema.test.ts`, which parses the
+migrations and fails if a table lacks RLS, policies, or its indexes.
+
 ## Running Locally
 
 ```bash

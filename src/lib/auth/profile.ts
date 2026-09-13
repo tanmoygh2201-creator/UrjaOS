@@ -1,12 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Profile } from "@/types/energy";
 
-export interface ProfileRecord {
-  id: string;
-  user_id: string;
-  full_name: string;
-  phone: string | null;
-  role: string;
-}
+export type ProfileRecord = Pick<
+  Profile,
+  "id" | "user_id" | "full_name" | "phone" | "role"
+>;
 
 const PROFILE_COLUMNS = "id, user_id, full_name, phone, role";
 

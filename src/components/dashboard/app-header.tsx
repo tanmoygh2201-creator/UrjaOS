@@ -9,6 +9,7 @@ import { LogoutButton } from "@/components/auth/logout-button";
 
 const NAV_LINKS = [
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/systems", label: "Systems" },
   { href: "/analytics", label: "Analytics" },
   { href: "/forecasting", label: "Forecasting" },
   { href: "/battery", label: "Battery" },

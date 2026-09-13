@@ -38,7 +38,7 @@ clearly labeled as recommendations/simulations.
 | Area | Status |
 | --- | --- |
 | Authentication (email/password, Supabase Auth) | ✅ Done |
-| Energy system CRUD (solar + battery + grid config) | ✅ Phase 4 |
+| Energy system CRUD (solar + battery + grid config) | ✅ Done |
 | Dashboard (KPIs, charts, energy flow) | ✅ Phase 5 |
 | Simulated IoT energy data (realistic patterns) | ✅ Phase 6 |
 | Analytics (cost, savings, utilization) | ✅ Phase 7 |
@@ -237,6 +237,18 @@ validity, and API authorization behavior.
   (`src/lib/auth/errors.ts`).
 - Profiles are created automatically by a database trigger and protected by RLS
   (`supabase/migrations/*_profiles.sql`).
+
+### Energy systems
+
+- `/systems` lists your systems (with an empty-state CTA for new users);
+  `/systems/new` and `/systems/[id]/edit` share one validated form.
+- Configuration covers solar capacity, battery limits (capacity, power,
+  SOC window, efficiencies), and tariffs — flat rate **or** time-of-use
+  periods with overnight-wrap support.
+- The same Zod rules run in the form actions and mirror the database CHECK
+  constraints, so invalid configurations are rejected at every layer.
+- Deleting a system requires an explicit two-step confirmation and cascades
+  to all readings, forecasts, schedules, and alerts.
 
 ## Git Workflow
 

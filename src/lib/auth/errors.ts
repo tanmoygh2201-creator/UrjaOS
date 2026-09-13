@@ -24,6 +24,11 @@ export function getAuthErrorMessage(error: AuthProviderError): string {
     return "Please confirm your email address before signing in. Check your inbox for the confirmation link.";
   }
   if (error.status === 429 || message.includes("rate limit")) {
+    // GoTrue's built-in SMTP rate limit hits when "Confirm email" is enabled
+    // but no custom SMTP is configured (free tier: ~2 emails/hour).
+    if (message.includes("email")) {
+      return "Sign-up is temporarily blocked by the email-sending limit. If this persists, disable email confirmation or configure custom SMTP in the Supabase dashboard.";
+    }
     return "Too many attempts. Please wait a moment and try again.";
   }
   if (message.includes("password should be at least") || message.includes("weak password")) {

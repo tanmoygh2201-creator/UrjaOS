@@ -180,6 +180,9 @@ export type EnergySystemInsert = Omit<
   "id" | "created_at" | "updated_at"
 >;
 
+/** A system configuration template without ownership (demo presets). */
+export type EnergySystemTemplate = Omit<EnergySystemInsert, "user_id">;
+
 export type EnergySystemUpdate = Partial<
   Omit<EnergySystem, "id" | "user_id" | "created_at" | "updated_at">
 >;

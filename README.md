@@ -40,7 +40,7 @@ clearly labeled as recommendations/simulations.
 | Authentication (email/password, Supabase Auth) | ✅ Done |
 | Energy system CRUD (solar + battery + grid config) | ✅ Done |
 | Dashboard (KPIs, charts, energy flow) | ✅ Phase 5 |
-| Simulated IoT energy data (realistic patterns) | ✅ Phase 6 |
+| Simulated IoT energy data (realistic patterns) | ✅ Done |
 | Analytics (cost, savings, utilization) | ✅ Phase 7 |
 | Solar + consumption forecasting (with MAE/RMSE/MAPE) | ✅ Phase 8 |
 | Battery optimization engine (rule-based, constraint-safe) | ✅ Phase 9 |
@@ -203,13 +203,33 @@ npm test         # unit tests (Phase 14)
 
 ## Demo Mode
 
-Once Phase 6 lands, the app ships with a **Factory Alpha** demo dataset:
+The app ships with a **Factory Alpha** demo dataset — one click seeds it:
 
 - Solar: 100 kW · Battery: 200 kWh
 - Average daily consumption: 850 kWh · Tariff: ₹8.50/kWh
 
-Demo controls (generate/reset data, simulate sunny/cloudy days) live behind a
-development-only guard so they are never exposed in production.
+Click **“Try the demo system”** on the empty systems page (or the dashboard)
+to create the demo system with 30 days of realistic hourly data, then explore
+the platform. The simulator also exposes scenario controls on every system
+page (sunny day, cloudy day, custom ranges) plus a reset.
+
+### How the simulator works
+
+- **Deterministic:** a seeded PRNG (mulberry32) means the same seed + inputs
+  always produce identical readings — reproducible for demos and tests.
+- **Solar:** sun-altitude bell curve (peaks ~13:00), seasonal factors,
+  cloud-cover reduction, panel-temperature derating, ±6% electrical noise.
+- **Consumption:** three load profiles (residential / commercial / industrial)
+  with weekday/weekend behavior, seasonal multipliers, and noise; hourly
+  energy is normalized so the day sums to the configured daily target.
+- **Battery + grid:** an hourly energy-balance loop — solar serves load first,
+  surplus charges the battery (respecting max charge power, SOC window, and
+  efficiency), then exports; deficits discharge during expensive tariff
+  windows and import the rest, never below min SOC.
+- **Pipeline:** Simulator → Zod validation → batched upserts (unique
+  `system_id, timestamp` keeps reruns idempotent) → Supabase → Dashboard.
+- **API:** `POST /api/simulation/generate` and `GET|DELETE /api/simulation`
+  (both verify authentication and system ownership).
 
 ## Testing
 

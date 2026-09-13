@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { DemoSystemButton } from "@/components/systems/demo-system-button";
 import { createClient } from "@/lib/supabase/server";
 import { formatKwh, formatKw } from "@/lib/energy/format";
 import { formatTariffSummary } from "@/lib/energy/tariff";
@@ -149,12 +150,19 @@ export default async function SystemsPage({ searchParams }: SystemsPageProps) {
                 generation, consumption, and battery — all in one place.
               </p>
             </div>
-            <Button asChild>
-              <Link href="/systems/new">
-                <Plus data-icon="inline-start" />
-                Create your first system
-              </Link>
-            </Button>
+            <div className="flex flex-col items-center gap-3 sm:flex-row">
+              <Button asChild>
+                <Link href="/systems/new">
+                  <Plus data-icon="inline-start" />
+                  Create your first system
+                </Link>
+              </Button>
+              <DemoSystemButton />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              The demo seeds “Factory Alpha” with 30 days of realistic data —
+              perfect for exploring UrjaOS instantly.
+            </p>
           </CardContent>
         </Card>
       ) : (

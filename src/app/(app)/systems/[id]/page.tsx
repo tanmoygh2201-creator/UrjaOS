@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DeleteSystemButton } from "@/components/systems/delete-system-button";
+import { SimulatorControls } from "@/components/systems/simulator-controls";
 import { createClient } from "@/lib/supabase/server";
 import {
   formatKwh,
@@ -167,18 +168,20 @@ export default async function SystemDetailPage({
         </CardContent>
       </Card>
 
+      <SimulatorControls systemId={system.id} />
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Monitoring data</CardTitle>
           <CardDescription>
-            Live readings, analytics, forecasts, and optimization arrive in the
-            next phases.
+            Simulated readings flow into the dashboard, analytics, and
+            forecasting modules.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            Once the simulator runs (Phase 6), this system will start collecting
-            solar, consumption, battery, and grid data automatically.
+            Use the simulator above to generate solar, consumption, battery,
+            and grid data — or connect real devices in a future version.
           </p>
         </CardContent>
       </Card>

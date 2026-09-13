@@ -138,3 +138,26 @@
     @apply font-sans;
   }
 }
+
+/* Energy-flow diagram: animated dashes for active connections. */
+.urja-flow-line {
+  stroke-dashoffset: 0;
+}
+.urja-flow-active {
+  animation-name: urja-flow-dash;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes urja-flow-dash {
+  from {
+    stroke-dashoffset: 28;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .urja-flow-active {
+    animation: none;
+  }
+}

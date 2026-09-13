@@ -39,7 +39,7 @@ clearly labeled as recommendations/simulations.
 | --- | --- |
 | Authentication (email/password, Supabase Auth) | ✅ Done |
 | Energy system CRUD (solar + battery + grid config) | ✅ Done |
-| Dashboard (KPIs, charts, energy flow) | ✅ Phase 5 |
+| Dashboard (KPIs, charts, energy flow) | ✅ Done |
 | Simulated IoT energy data (realistic patterns) | ✅ Done |
 | Analytics (cost, savings, utilization) | ✅ Phase 7 |
 | Solar + consumption forecasting (with MAE/RMSE/MAPE) | ✅ Phase 8 |
@@ -257,6 +257,21 @@ validity, and API authorization behavior.
   (`src/lib/auth/errors.ts`).
 - Profiles are created automatically by a database trigger and protected by RLS
   (`supabase/migrations/*_profiles.sql`).
+
+### Dashboard
+
+- **KPI cards:** solar generation, consumption, battery SOC, grid import/export,
+  and estimated savings — for the latest day in your data.
+- **Energy flow diagram:** animated SVG showing Solar → Load / Battery / Grid
+  and Battery/Grid → Load; flow speed and thickness scale with the actual
+  energy moved (respects `prefers-reduced-motion`).
+- **Charts (Recharts):** hourly solar vs consumption with SOC overlay,
+  battery charge/discharge bars, and a 7-day daily overview.
+- **Timezone-correct aggregation:** readings are stored as UTC but bucketed by
+  the viewer's **local day** — the classic UTC-slice bug is covered by tests.
+- **Cost & savings engine** (`src/lib/energy/cost.ts`): pure, fully tested
+  functions; savings are estimates valued at your tariff and always labeled
+  as such — never guarantees.
 
 ### Energy systems
 

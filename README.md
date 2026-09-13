@@ -1,36 +1,229 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# UrjaOS ⚡
 
-## Getting Started
+> **Optimize Energy. Reduce Cost. Power Smarter.**
 
-First, run the development server:
+UrjaOS is an AI-powered energy management platform that monitors solar generation
+and electricity consumption, forecasts energy demand, and optimizes battery usage
+to reduce electricity costs.
+
+It is built as a production-quality, student-friendly full-stack application:
+it works today as a college project on simulated IoT data, and is architected to
+evolve into a commercially viable SaaS product.
+
+---
+
+## Project Overview
+
+Solar generation is variable, consumption changes throughout the day, and battery
+storage needs intelligent scheduling. Owners usually cannot easily answer:
+
+- How much solar energy will I generate tomorrow?
+- When is electricity expensive, and when should my battery charge/discharge?
+- Why did my bill increase? Is my solar system performing normally?
+- How much money is solar (and battery optimization) actually saving me?
+
+UrjaOS turns raw energy data into actionable decisions:
+
+> **Do not merely show the user what happened. Tell the user what they should do next — and why.**
+
+### Product philosophy: Monitor → Understand → Predict → Optimize → Automate
+
+**V1 = Monitor + Understand + Predict + Simulated Optimization.**
+UrjaOS V1 is a *decision-support and simulation platform*. It does **not** control
+physical batteries, inverters, or grid equipment. All optimization outputs are
+clearly labeled as recommendations/simulations.
+
+## Features (MVP)
+
+| Area | Status |
+| --- | --- |
+| Authentication (email/password, Supabase Auth) | ✅ Phase 2 |
+| Energy system CRUD (solar + battery + grid config) | ✅ Phase 4 |
+| Dashboard (KPIs, charts, energy flow) | ✅ Phase 5 |
+| Simulated IoT energy data (realistic patterns) | ✅ Phase 6 |
+| Analytics (cost, savings, utilization) | ✅ Phase 7 |
+| Solar + consumption forecasting (with MAE/RMSE/MAPE) | ✅ Phase 8 |
+| Battery optimization engine (rule-based, constraint-safe) | ✅ Phase 9 |
+| AI Energy Copilot (context-grounded, server-side key) | ✅ Phase 10 |
+| Alerts + Bill analyzer | ✅ Phase 11 |
+| Reports | ✅ Phase 12 |
+| Demo mode (Factory Alpha dataset) | ✅ Phase 6 |
+
+## Architecture
+
+```text
+┌────────────────────────── Next.js (App Router) ──────────────────────────┐
+│  UI (React + Tailwind + shadcn/ui + Recharts)                            │
+│    ↓                                                                     │
+│  Route Handlers / Server Actions (validation via Zod, auth checks)       │
+│    ↓                                                                     │
+│  Domain logic (src/lib)                                                  │
+│    ├── energy/        cost + savings engines                             │
+│    ├── forecasting/   statistical models + accuracy metrics              │
+│    ├── optimization/  battery constraints + schedule optimizer           │
+│    ├── ai/            provider-agnostic LLM calls (server-only)          │
+│    └── simulation/    realistic IoT data simulator                        │
+│    ↓                                                                     │
+│  Supabase client (src/lib/supabase)                                      │
+└──────────────────────────────────────────────────────────────────────────┘
+                                 ↓
+                    Supabase (PostgreSQL + Auth + RLS)
+```
+
+### Project structure
+
+```text
+urjaos/
+├── src/
+│   ├── app/            # App Router pages (landing, auth, dashboard, ...)
+│   ├── components/     # ui/ (shadcn), dashboard/, charts/, ...
+│   ├── lib/            # supabase/, energy/, forecasting/, optimization/, ai/
+│   ├── types/          # shared TypeScript types
+│   └── utils/
+├── supabase/migrations/ # SQL migrations (schema + RLS policies)
+├── tests/              # unit tests for core logic
+├── .env.example        # documented environment variables
+└── README.md
+```
+
+## Tech Stack
+
+- **Next.js 16** (App Router) + **TypeScript** (strict)
+- **Tailwind CSS v4** + **shadcn/ui**
+- **Supabase** — PostgreSQL, Auth (email/password), Row Level Security
+- **Recharts** for charts
+- **Zod** for validation
+- **Vercel** for deployment
+
+## Prerequisites
+
+- **Node.js 20+** (developed on Node 24) — <https://nodejs.org>
+- **npm 10+**
+- A free **Supabase** account — <https://supabase.com>
+- Git
+
+## Installation
+
+```bash
+# 1. Clone and enter the project
+git clone <your-repo-url>
+cd urjaos
+
+# 2. Install dependencies
+npm install
+
+# 3. Create your environment file
+cp .env.example .env.local    # PowerShell: Copy-Item .env.example .env.local
+```
+
+## Environment Variables
+
+| Variable | Where it's used | Description |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | browser + server | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | browser + server | Public anon key (safe — RLS protects data) |
+| `AI_API_KEY` | **server only** | LLM API key (Phase 10). Never use the `NEXT_PUBLIC_` prefix for secrets |
+| `AI_PROVIDER` | server only | Which AI provider to call (e.g. `openai`) |
+
+- `.env.local` is git-ignored — never commit secrets.
+- Get the Supabase URL + anon key from **Supabase Dashboard → Project Settings → API**.
+
+## Supabase Setup
+
+1. Create a project at <https://supabase.com> (free tier is enough).
+2. Copy the **Project URL** and **anon public key** into `.env.local`.
+3. **Authentication → Providers → Email**: enabled by default. For local dev you
+   may disable "Confirm email" to make registration instant.
+4. **Authentication → URL Configuration**: add `http://localhost:3000/**` to
+   redirect URLs (add your Vercel domain later).
+5. Run the database migrations (once Phase 3 lands):
+
+   ```bash
+   npx supabase link --project-ref <your-project-ref>
+   npx supabase db push
+   ```
+
+6. Verify **Row Level Security** is enabled on all tables with the policies from
+   `supabase/migrations/`. Users can only read/write data belonging to their own
+   `energy_systems`.
+
+## Running Locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>. You should see the UrjaOS landing page.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Other commands:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint     # ESLint
+npm run build    # production build (also type-checks)
+npm run start    # serve the production build
+npm test         # unit tests (Phase 14)
+```
 
-## Learn More
+## Demo Mode
 
-To learn more about Next.js, take a look at the following resources:
+Once Phase 6 lands, the app ships with a **Factory Alpha** demo dataset:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Solar: 100 kW · Battery: 200 kWh
+- Average daily consumption: 850 kWh · Tariff: ₹8.50/kWh
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Demo controls (generate/reset data, simulate sunny/cloudy days) live behind a
+development-only guard so they are never exposed in production.
 
-## Deploy on Vercel
+## Testing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Core logic has unit tests (Phase 14): cost & savings calculations, battery SOC
+constraints, charge/discharge limits, forecast validity, optimization schedule
+validity, and API authorization behavior.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm test
+```
+
+## Git Workflow
+
+```bash
+git checkout -b feature/my-feature
+# ... commit small, focused commits ...
+git push -u origin feature/my-feature   # then open a Pull Request
+```
+
+Commit style follows the build order of the project (e.g. `Add authentication`,
+`Add energy simulator`, `Add battery optimization`).
+
+## Deployment (Vercel + Supabase)
+
+1. Push the repository to GitHub.
+2. In Vercel, **Import Project** and select the repository.
+3. Add the environment variables from `.env.example` in **Settings → Environment Variables**.
+4. Deploy. Then in Supabase → **Authentication → URL Configuration**, add
+   `https://<your-app>.vercel.app/**` as a redirect URL.
+5. Verify: register/login, dashboard, forecast, optimization, AI Copilot.
+
+## Security Notes
+
+- Supabase Auth handles passwords (never stored in our database).
+- **RLS is always on** — users can only access their own systems and readings.
+- AI keys are server-side only; the browser talks to `/api/ai/*`, never to the
+  LLM provider directly.
+- All API inputs are validated with Zod; errors never leak stack traces.
+
+## Future Roadmap
+
+| Version | Scope |
+| --- | --- |
+| **V2** | Real inverter APIs, smart meters, real IoT telemetry, advanced forecasting |
+| **V3** | EV charging optimization, industrial load optimization, multi-site management |
+| **V4** | Battery health prediction, predictive maintenance, advanced BESS analytics |
+| **V5** | Demand response, virtual power plants, energy trading, grid optimization |
+
+The database is designed so Organizations → Sites → Systems → Devices multi-tenancy
+can be layered in later without breaking the MVP schema.
+
+---
+
+Built with ⚡ by the UrjaOS team.

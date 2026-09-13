@@ -37,7 +37,7 @@ clearly labeled as recommendations/simulations.
 
 | Area | Status |
 | --- | --- |
-| Authentication (email/password, Supabase Auth) | ✅ Phase 2 |
+| Authentication (email/password, Supabase Auth) | ✅ Done |
 | Energy system CRUD (solar + battery + grid config) | ✅ Phase 4 |
 | Dashboard (KPIs, charts, energy flow) | ✅ Phase 5 |
 | Simulated IoT energy data (realistic patterns) | ✅ Phase 6 |
@@ -75,13 +75,14 @@ clearly labeled as recommendations/simulations.
 ```text
 urjaos/
 ├── src/
-│   ├── app/            # App Router pages (landing, auth, dashboard, ...)
-│   ├── components/     # ui/ (shadcn), dashboard/, charts/, ...
-│   ├── lib/            # supabase/, energy/, forecasting/, optimization/, ai/
+│   ├── app/            # App Router pages (landing, (auth), (app), actions)
+│   ├── components/     # ui/ (shadcn), auth/, dashboard/, charts/, ...
+│   ├── lib/            # supabase/, auth/, validation/, energy/, forecasting/
+│   ├── proxy.ts        # Next 16 session middleware (protected routes)
 │   ├── types/          # shared TypeScript types
 │   └── utils/
 ├── supabase/migrations/ # SQL migrations (schema + RLS policies)
-├── tests/              # unit tests for core logic
+├── tests/              # unit tests for core logic (vitest)
 ├── .env.example        # documented environment variables
 └── README.md
 ```
@@ -134,6 +135,11 @@ cp .env.example .env.local    # PowerShell: Copy-Item .env.example .env.local
 2. Copy the **Project URL** and **anon public key** into `.env.local`.
 3. **Authentication → Providers → Email**: enabled by default. For local dev you
    may disable "Confirm email" to make registration instant.
+
+   ```powershell
+   # apply the profiles migration (and all future ones)
+   npx supabase db push
+   ```
 4. **Authentication → URL Configuration**: add `http://localhost:3000/**` to
    redirect URLs (add your Vercel domain later).
 5. Run the database migrations (once Phase 3 lands):
@@ -176,13 +182,30 @@ development-only guard so they are never exposed in production.
 
 ## Testing
 
-Core logic has unit tests (Phase 14): cost & savings calculations, battery SOC
+Unit tests run with **Vitest**. Auth logic (validation schemas, error mapping,
+redirect sanitization) is already covered:
+
+```bash
+npm test        # 24 tests passing
+```
+
+More suites land with each phase: cost & savings calculations, battery SOC
 constraints, charge/discharge limits, forecast validity, optimization schedule
 validity, and API authorization behavior.
 
-```bash
-npm test
-```
+### How authentication works
+
+- `src/proxy.ts` (Next.js 16's renamed middleware) refreshes Supabase session
+  cookies on every request and **fails closed**: protected routes redirect to
+  `/login?next=…` without a verified session.
+- The `(app)` route group re-verifies the user server-side in its layout
+  (defense in depth).
+- Redirect targets are sanitized against open redirects
+  (`src/lib/auth/redirect.ts`).
+- Supabase Auth errors are mapped to safe, friendly messages
+  (`src/lib/auth/errors.ts`).
+- Profiles are created automatically by a database trigger and protected by RLS
+  (`supabase/migrations/*_profiles.sql`).
 
 ## Git Workflow
 

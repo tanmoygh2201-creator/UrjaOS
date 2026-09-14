@@ -43,7 +43,7 @@ clearly labeled as recommendations/simulations.
 | Simulated IoT energy data (realistic patterns) | ✅ Done |
 | Analytics (ranges, utilization, cost breakdown) | ✅ Done |
 | Solar + consumption forecasting (with MAE/RMSE/MAPE) | ✅ Done |
-| Battery optimization engine (rule-based, constraint-safe) | ✅ Phase 9 |
+| Battery optimization engine (rule-based, constraint-safe) | ✅ Done |
 | AI Energy Copilot (context-grounded, server-side key) | ✅ Phase 10 |
 | Alerts + Bill analyzer | ✅ Phase 11 |
 | Reports | ✅ Phase 12 |

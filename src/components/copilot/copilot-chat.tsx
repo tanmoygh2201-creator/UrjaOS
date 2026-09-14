@@ -32,6 +32,9 @@ export function CopilotChat({ systems, initialSystemId }: CopilotChatProps) {
     if (trimmed.length < 3 || pending) return;
     setQuestion("");
     setMessages((prev) => [...prev, { role: "user", content: trimmed }]);
+    requestAnimationFrame(() =>
+      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" })
+    );
 
     const formData = new FormData();
     formData.set("question", trimmed);
@@ -95,8 +98,10 @@ export function CopilotChat({ systems, initialSystemId }: CopilotChatProps) {
           messages.map((message, index) => (
             <div
               key={index}
-              className={`flex items-start gap-2.5 ${
-                message.role === "user" ? "flex-row-reverse" : ""
+              className={`flex items-start gap-2.5 animate-in fade-in duration-300 ${
+                message.role === "user"
+                  ? "flex-row-reverse slide-in-from-right-2"
+                  : "slide-in-from-bottom-2"
               }`}
             >
               <span
@@ -135,9 +140,21 @@ export function CopilotChat({ systems, initialSystemId }: CopilotChatProps) {
           ))
         )}
         {pending ? (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-            Reading your system data…
+          <div
+            className="flex items-start gap-2.5 animate-in fade-in slide-in-from-bottom-2 duration-300"
+            role="status"
+            aria-label="Copilot is thinking"
+          >
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Bot className="size-4" aria-hidden="true" />
+            </span>
+            <div className="rounded-xl bg-muted/60 px-4 py-3.5">
+              <div className="flex items-center gap-1.5">
+                <span className="size-2 animate-pulse rounded-full bg-muted-foreground/60" />
+                <span className="size-2 animate-pulse rounded-full bg-muted-foreground/60 [animation-delay:200ms]" />
+                <span className="size-2 animate-pulse rounded-full bg-muted-foreground/60 [animation-delay:400ms]" />
+              </div>
+            </div>
           </div>
         ) : null}
         <div ref={bottomRef} />

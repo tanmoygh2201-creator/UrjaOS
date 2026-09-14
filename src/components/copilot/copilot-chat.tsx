@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { askCopilotAction } from "@/app/actions/copilot";
 import { SUGGESTED_QUESTIONS } from "@/lib/validation/copilot";
+import { MarkdownAnswer } from "@/components/copilot/markdown-answer";
 
 interface CopilotChatProps {
   systems: { id: string; name: string }[];
@@ -124,7 +125,11 @@ export function CopilotChat({ systems, initialSystemId }: CopilotChatProps) {
                       : "bg-muted/60 text-foreground"
                 }`}
               >
-                {message.content}
+                {message.role === "assistant" && !message.isError ? (
+                  <MarkdownAnswer content={message.content} />
+                ) : (
+                  message.content
+                )}
               </div>
             </div>
           ))

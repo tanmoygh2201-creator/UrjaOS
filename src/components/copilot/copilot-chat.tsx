@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { AlertTriangle, Bot, Loader2, Send, User } from "lucide-react";
+import { AlertTriangle, Loader2, Send, Sun, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { askCopilotAction } from "@/app/actions/copilot";
@@ -17,6 +17,66 @@ interface ChatEntry {
   role: "user" | "assistant";
   content: string;
   isError?: boolean;
+}
+
+/**
+ * The Copilot's replying agent: an animated sun.
+ *
+ * Rays spin slowly at rest and much faster while thinking, with a soft
+ * pulsing glow behind. Error answers swap the sun for a warning triangle.
+ */
+function CopilotAvatar({
+  variant,
+  thinking = false,
+}: {
+  variant: "sun" | "error" | "user";
+  thinking?: boolean;
+}) {
+  if (variant === "user") {
+    return (
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-secondary to-secondary/70 text-secondary-foreground ring-1 ring-border/60 shadow-[0_1px_2px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.4)]">
+        <User className="size-4" aria-hidden="true" />
+      </span>
+    );
+  }
+  if (variant === "error") {
+    return (
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-destructive/20 to-destructive/10 text-destructive ring-1 ring-destructive/25 shadow-[0_1px_2px_rgba(0,0,0,0.08)]">
+        <AlertTriangle className="size-4" aria-hidden="true" />
+      </span>
+    );
+  }
+  return (
+    <span
+      className={`relative flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-amber-200 via-yellow-300 to-orange-400 ring-1 ring-amber-500/30 shadow-[0_2px_6px_rgba(245,158,11,0.35),inset_0_1px_0_rgba(255,255,255,0.55)] ${
+        thinking ? "animate-pulse" : ""
+      }`}
+    >
+      <span
+        className="absolute inset-0 rounded-full bg-amber-400/40 blur-[3px]"
+        aria-hidden="true"
+      />
+      <Sun
+        className={`relative size-[18px] text-orange-600 animate-spin ${
+          thinking ? "[animation-duration:1.6s]" : "[animation-duration:14s]"
+        }`}
+        aria-hidden="true"
+      />
+    </span>
+  );
+}
+
+/** Bubble surface with 3D depth: gradient, layered shadow, inner highlight, tail. */
+function bubbleClasses(role: "user" | "assistant", isError: boolean): string {
+  const base =
+    "relative max-w-[85%] whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-sm before:absolute before:top-3 before:size-2.5 before:rotate-45 before:rounded-[2px]";
+  if (role === "user") {
+    return `${base} before:-right-1 before:bg-primary/90 bg-gradient-to-b from-primary to-primary/85 text-primary-foreground ring-1 ring-primary/25 shadow-[0_1px_2px_rgba(0,0,0,0.12),0_6px_14px_-4px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.25)]`;
+  }
+  if (isError) {
+    return `${base} before:-left-1 before:bg-destructive/10 bg-gradient-to-b from-destructive/15 to-destructive/5 text-destructive ring-1 ring-destructive/20 shadow-[0_1px_2px_rgba(0,0,0,0.06),0_5px_12px_-4px_rgba(0,0,0,0.12)]`;
+  }
+  return `${base} before:-left-1 before:bg-muted/70 bg-gradient-to-b from-background to-muted/50 text-foreground ring-1 ring-border/50 shadow-[0_1px_2px_rgba(0,0,0,0.05),0_5px_12px_-4px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.6)]`;
 }
 
 /** Grounded chat over the user's own system data (spec §41). */
@@ -88,7 +148,8 @@ export function CopilotChat({ systems, initialSystemId }: CopilotChatProps) {
         aria-live="polite"
       >
         {messages.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center py-8 text-center">
+          <div className="flex flex-1 flex-col items-center justify-center gap-3 py-8 text-center">
+            <CopilotAvatar variant="sun" />
             <p className="max-w-sm text-sm text-muted-foreground">
               Ask anything about this system — the Copilot answers only from
               your real readings, forecasts, and plans. No data, no answer.
@@ -104,32 +165,16 @@ export function CopilotChat({ systems, initialSystemId }: CopilotChatProps) {
                   : "slide-in-from-bottom-2"
               }`}
             >
-              <span
-                className={`flex size-7 shrink-0 items-center justify-center rounded-lg ${
+              <CopilotAvatar
+                variant={
                   message.role === "user"
-                    ? "bg-secondary text-secondary-foreground"
+                    ? "user"
                     : message.isError
-                      ? "bg-destructive/10 text-destructive"
-                      : "bg-primary/10 text-primary"
-                }`}
-              >
-                {message.role === "user" ? (
-                  <User className="size-4" aria-hidden="true" />
-                ) : message.isError ? (
-                  <AlertTriangle className="size-4" aria-hidden="true" />
-                ) : (
-                  <Bot className="size-4" aria-hidden="true" />
-                )}
-              </span>
-              <div
-                className={`max-w-[85%] whitespace-pre-wrap rounded-xl px-3.5 py-2.5 text-sm ${
-                  message.role === "user"
-                    ? "bg-secondary text-secondary-foreground"
-                    : message.isError
-                      ? "bg-destructive/10 text-destructive"
-                      : "bg-muted/60 text-foreground"
-                }`}
-              >
+                      ? "error"
+                      : "sun"
+                }
+              />
+              <div className={bubbleClasses(message.role, Boolean(message.isError))}>
                 {message.role === "assistant" && !message.isError ? (
                   <MarkdownAnswer content={message.content} />
                 ) : (
@@ -145,14 +190,12 @@ export function CopilotChat({ systems, initialSystemId }: CopilotChatProps) {
             role="status"
             aria-label="Copilot is thinking"
           >
-            <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <Bot className="size-4" aria-hidden="true" />
-            </span>
-            <div className="rounded-xl bg-muted/60 px-4 py-3.5">
+            <CopilotAvatar variant="sun" thinking />
+            <div className="relative rounded-2xl bg-gradient-to-b from-background to-muted/50 ring-1 ring-border/50 shadow-[0_1px_2px_rgba(0,0,0,0.05),0_5px_12px_-4px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.6)] before:absolute before:top-3 before:-left-1 before:size-2.5 before:rotate-45 before:rounded-[2px] before:bg-muted/70 px-4 py-3.5">
               <div className="flex items-center gap-1.5">
-                <span className="size-2 animate-pulse rounded-full bg-muted-foreground/60" />
-                <span className="size-2 animate-pulse rounded-full bg-muted-foreground/60 [animation-delay:200ms]" />
-                <span className="size-2 animate-pulse rounded-full bg-muted-foreground/60 [animation-delay:400ms]" />
+                <span className="size-2 animate-pulse rounded-full bg-amber-500/70" />
+                <span className="size-2 animate-pulse rounded-full bg-amber-500/70 [animation-delay:200ms]" />
+                <span className="size-2 animate-pulse rounded-full bg-amber-500/70 [animation-delay:400ms]" />
               </div>
             </div>
           </div>

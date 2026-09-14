@@ -120,12 +120,19 @@ export default async function SystemsPage({ searchParams }: SystemsPageProps) {
             Solar, battery, and grid configurations you monitor with UrjaOS.
           </p>
         </div>
-        <Button asChild>
-          <Link href="/systems/new">
-            <Plus data-icon="inline-start" />
-            New system
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <DemoSystemButton
+            scenario="factory-alpha-tou"
+            label="Add TOU demo"
+            variant="outline"
+          />
+          <Button asChild>
+            <Link href="/systems/new">
+              <Plus data-icon="inline-start" />
+              New system
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {deleted ? (

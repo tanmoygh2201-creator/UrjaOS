@@ -68,7 +68,8 @@ export default async function BatteryPage({ searchParams }: BatteryPageProps) {
               <Button asChild>
                 <Link href="/systems/new">Create a system</Link>
               </Button>
-              <DemoSystemButton />
+              <DemoSystemButton scenario="factory-alpha-tou" label="Try the TOU demo" />
+              <DemoSystemButton label="Try the flat-tariff demo" />
             </div>
           </CardContent>
         </Card>

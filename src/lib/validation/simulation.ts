@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DEMO_SCENARIOS } from "@/lib/simulation/demo";
 
 export const generateSimulationSchema = z.object({
   days: z.coerce
@@ -18,6 +19,12 @@ export const generateSimulationSchema = z.object({
 
 export type GenerateSimulationInput = z.infer<typeof generateSimulationSchema>;
 
+/** Scenario keys are the demo presets — unknown keys never reach the seeder. */
+const scenarioKeys = DEMO_SCENARIOS.map((s) => s.key) as [
+  string,
+  ...string[]
+];
+
 export const demoSeedSchema = z.object({
-  scenario: z.string().trim().min(1).max(40).default("factory-alpha"),
+  scenario: z.enum(scenarioKeys).default("factory-alpha"),
 });

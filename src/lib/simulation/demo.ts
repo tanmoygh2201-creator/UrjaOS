@@ -3,6 +3,8 @@
  *
  * Factory Alpha is the canonical faculty-demo dataset:
  *   Solar 100 kW · Battery 200 kWh · ~850 kWh/day consumption · ₹8.50/kWh.
+ * Factory Alpha TOU swaps the flat tariff for a time-of-use one so the
+ * battery optimizer has real arbitrage to demonstrate.
  */
 import type { EnergySystemTemplate } from "@/types/energy";
 
@@ -37,6 +39,37 @@ export const DEMO_SCENARIOS: DemoScenario[] = [
       battery_charge_efficiency: 0.95,
       battery_discharge_efficiency: 0.95,
       electricity_tariff: { type: "flat", currency: INR, rate: 8.5 },
+      currency: INR,
+    },
+    dailyKwhTarget: 850,
+    days: 30,
+    cloudiness: 0.25,
+  },
+  {
+    key: "factory-alpha-tou",
+    label: "Factory Alpha TOU (demo)",
+    description:
+      "Same industrial site on a time-of-use tariff: ₹5/kWh off-peak, ₹14/kWh peak (17–22h) — the battery optimizer has real arbitrage to find.",
+    system: {
+      name: "Factory Alpha TOU",
+      location: "Pune, MH",
+      system_type: "industrial",
+      solar_capacity_kw: 100,
+      battery_capacity_kwh: 200,
+      battery_max_charge_kw: 50,
+      battery_max_discharge_kw: 50,
+      min_soc: 10,
+      max_soc: 90,
+      battery_charge_efficiency: 0.95,
+      battery_discharge_efficiency: 0.95,
+      electricity_tariff: {
+        type: "tou",
+        currency: INR,
+        periods: [
+          { name: "off-peak", startHour: 22, endHour: 17, rate: 5 },
+          { name: "peak", startHour: 17, endHour: 22, rate: 14 },
+        ],
+      },
       currency: INR,
     },
     dailyKwhTarget: 850,

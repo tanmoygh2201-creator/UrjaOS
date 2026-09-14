@@ -44,7 +44,7 @@ clearly labeled as recommendations/simulations.
 | Analytics (ranges, utilization, cost breakdown) | ✅ Done |
 | Solar + consumption forecasting (with MAE/RMSE/MAPE) | ✅ Done |
 | Battery optimization engine (rule-based, constraint-safe) | ✅ Done |
-| AI Energy Copilot (context-grounded, server-side key) | ✅ Phase 10 |
+| AI Energy Copilot (context-grounded, server-side key) | ✅ Done |
 | Alerts + Bill analyzer | ✅ Phase 11 |
 | Reports | ✅ Phase 12 |
 | Demo mode (Factory Alpha dataset) | ✅ Phase 6 |
@@ -123,8 +123,8 @@ cp .env.example .env.local    # PowerShell: Copy-Item .env.example .env.local
 | --- | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | browser + server | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | browser + server | Public anon key (safe — RLS protects data) |
-| `AI_API_KEY` | **server only** | LLM API key (Phase 10). Never use the `NEXT_PUBLIC_` prefix for secrets |
-| `AI_PROVIDER` | server only | Which AI provider to call (e.g. `openai`) |
+| `AI_API_KEY` | **server only** | LLM API key for the Copilot. Leave empty to disable AI — the app shows a "not configured" state. Never use the `NEXT_PUBLIC_` prefix for secrets |
+| `AI_PROVIDER` | server only | `openai` (default), `groq`, or `openrouter` — any OpenAI-compatible endpoint |
 
 - `.env.local` is git-ignored — never commit secrets.
 - Get the Supabase URL + anon key from **Supabase Dashboard → Project Settings → API**.

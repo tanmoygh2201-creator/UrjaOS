@@ -108,15 +108,18 @@ describe("runOptimization sentinels", () => {
 
 describe("getOptimizationPageData", () => {
   it("assembles summary from persisted schedule rows", async () => {
-    const future = (hoursAhead: number): string => {
+    // Deterministic local hours TOMORROW, so TOU window resolution never
+    // depends on the wall-clock time the suite happens to run at.
+    const at = (hour: number): string => {
       const d = new Date();
-      d.setHours(d.getHours() + hoursAhead, 0, 0, 0);
+      d.setDate(d.getDate() + 1);
+      d.setHours(hour, 0, 0, 0);
       return d.toISOString();
     };
     const rows: Partial<OptimizationSchedule>[] = [
       {
         system_id: "sys-1",
-        timestamp: future(2),
+        timestamp: at(10), // day window → ₹6
         action: "grid",
         charge_power: 10,
         discharge_power: 0,
@@ -125,7 +128,7 @@ describe("getOptimizationPageData", () => {
       },
       {
         system_id: "sys-1",
-        timestamp: future(20),
+        timestamp: at(18), // peak window → ₹12
         action: "discharge",
         charge_power: 0,
         discharge_power: 9,
@@ -153,7 +156,8 @@ describe("getOptimizationPageData", () => {
     expect(data.summary.totalDischargeKwh).toBeCloseTo(9, 3);
     expect(data.summary.gridChargeKwh).toBeCloseTo(10, 3);
     expect(data.summary.arbitrageEnabled).toBe(true);
-    // Tariff on the discharge hour resolves from the system's TOU config.
+    // Tariff on the discharge hour resolves from the system's TOU config
+    // (18:00 local → peak window, ₹12).
     expect(data.schedule[1].tariffRate).toBe(12);
   });
 });

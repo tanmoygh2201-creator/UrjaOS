@@ -106,6 +106,42 @@ describe("provider config", () => {
       AI_PROVIDER: "openrouter",
     })!;
     expect(openrouter.baseUrl).toBe("https://openrouter.ai/api/v1");
+
+    const nvidia = resolveProviderConfig({
+      AI_API_KEY: "nvapi-test",
+      AI_PROVIDER: "nvidia",
+    })!;
+    expect(nvidia.baseUrl).toBe("https://integrate.api.nvidia.com/v1");
+    expect(nvidia.model).toBe("openai/gpt-oss-20b");
+  });
+
+  it("tolerates quoted or padded AI_PROVIDER values", () => {
+    for (const raw of [" nvidia ", '"nvidia"', "'nvidia'", "NVIDIA"]) {
+      const config = resolveProviderConfig({
+        AI_API_KEY: "nvapi-test",
+        AI_PROVIDER: raw,
+      })!;
+      expect(config.baseUrl).toBe("https://integrate.api.nvidia.com/v1");
+    }
+  });
+
+  it("honors AI_MODEL and AI_BASE_URL overrides for any provider", () => {
+    const config = resolveProviderConfig({
+      AI_API_KEY: "nvapi-test",
+      AI_PROVIDER: "nvidia",
+      AI_MODEL: "meta/llama-3.1-nemotron-70b-instruct",
+      AI_BASE_URL: "https://custom.nim.example/v1",
+    })!;
+    expect(config.model).toBe("meta/llama-3.1-nemotron-70b-instruct");
+    expect(config.baseUrl).toBe("https://custom.nim.example/v1");
+  });
+
+  it("gives reasoning models a generous token budget", () => {
+    const config = resolveProviderConfig({
+      AI_API_KEY: "nvapi-test",
+      AI_PROVIDER: "nvidia",
+    })!;
+    expect(config.maxTokens).toBeGreaterThanOrEqual(1000);
   });
 
   it("never exposes the key in the request body", () => {

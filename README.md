@@ -124,7 +124,9 @@ cp .env.example .env.local    # PowerShell: Copy-Item .env.example .env.local
 | `NEXT_PUBLIC_SUPABASE_URL` | browser + server | Your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | browser + server | Public anon key (safe — RLS protects data) |
 | `AI_API_KEY` | **server only** | LLM API key for the Copilot. Leave empty to disable AI — the app shows a "not configured" state. Never use the `NEXT_PUBLIC_` prefix for secrets |
-| `AI_PROVIDER` | server only | `openai` (default), `groq`, or `openrouter` — any OpenAI-compatible endpoint |
+| `AI_PROVIDER` | server only | `openai` (default), `groq`, `openrouter`, or `nvidia` (NVIDIA NIM, `nvapi-…` keys) — any OpenAI-compatible endpoint |
+| `AI_MODEL` | server only | Optional model override (e.g. `openai/gpt-oss-20b` on NVIDIA). Defaults per provider; NVIDIA catalog models retire often, so pin one there if needed |
+| `AI_BASE_URL` | server only | Optional endpoint override for any OpenAI-compatible server (vLLM, Ollama, …) |
 
 - `.env.local` is git-ignored — never commit secrets.
 - Get the Supabase URL + anon key from **Supabase Dashboard → Project Settings → API**.

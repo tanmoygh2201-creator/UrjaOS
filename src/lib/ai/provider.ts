@@ -44,6 +44,27 @@ export class ProviderError extends Error {
 /** Minimal env shape the provider layer needs (testable without process.env). */
 export type ProviderEnv = Record<string, string | undefined>;
 
+/**
+ * Provider presets: OpenAI-compatible base URLs + a sensible default model.
+ * All of them speak the same `/chat/completions` contract, so the request
+ * builder below never changes — only this table does.
+ */
+const PROVIDER_PRESETS: Record<
+  string,
+  { baseUrl: string; model: string }
+> = {
+  openai: { baseUrl: "https://api.openai.com/v1", model: "gpt-4o-mini" },
+  groq: { baseUrl: "https://api.groq.com/openai/v1", model: "llama-3.1-8b-instant" },
+  openrouter: { baseUrl: "https://openrouter.ai/api/v1", model: "openai/gpt-4o-mini" },
+  // NVIDIA NIM (build.nvidia.com) — `nvapi-…` keys. Catalog models retire
+  // often (llama-3.1-8b died 2026-08-26); the default below is verified
+  // serving, and AI_MODEL overrides it without code changes.
+  nvidia: {
+    baseUrl: "https://integrate.api.nvidia.com/v1",
+    model: "openai/gpt-oss-20b",
+  },
+};
+
 /** Resolves provider config from env. Returns null when not configured. */
 export function resolveProviderConfig(
   env: ProviderEnv = process.env
@@ -51,27 +72,32 @@ export function resolveProviderConfig(
   const apiKey = (env.AI_API_KEY ?? "").trim();
   if (apiKey.length === 0) return null;
 
-  const provider = (env.AI_PROVIDER ?? "openai").trim().toLowerCase();
-  const baseUrl =
-    provider === "groq"
-      ? "https://api.groq.com/openai/v1"
-      : provider === "openrouter"
-        ? "https://openrouter.ai/api/v1"
-        : "https://api.openai.com/v1";
+  // Tolerant parsing: " nvidia " or '"nvidia"' (quote-pasted values) resolve
+  // the same as nvidia.
+  const rawProvider = (env.AI_PROVIDER ?? "openai").trim();
+  const provider =
+    rawProvider.length >= 2 &&
+    ((rawProvider.startsWith('"') && rawProvider.endsWith('"')) ||
+      (rawProvider.startsWith("'") && rawProvider.endsWith("'")))
+      ? rawProvider.slice(1, -1).trim().toLowerCase()
+      : rawProvider.toLowerCase();
 
-  const model =
-    provider === "groq"
-      ? "llama-3.1-8b-instant"
-      : provider === "openrouter"
-        ? "openai/gpt-4o-mini"
-        : "gpt-4o-mini";
+  const preset = PROVIDER_PRESETS[provider] ?? PROVIDER_PRESETS.openai;
+
+  // Optional overrides so any compatible endpoint/model works without code
+  // changes (e.g. a specific NIM catalog model via AI_MODEL).
+  const baseUrl = (env.AI_BASE_URL ?? "").trim() || preset.baseUrl;
+  const model = (env.AI_MODEL ?? "").trim() || preset.model;
 
   return {
     apiKey,
     model,
     baseUrl,
     temperature: 0.3,
-    maxTokens: 700,
+    // Generous budget: reasoning-style models (e.g. gpt-oss on NVIDIA NIM)
+    // spend tokens thinking before the visible answer, so a tight cap yields
+    // an empty `content` and an unreadable-response error.
+    maxTokens: 1000,
   };
 }
 

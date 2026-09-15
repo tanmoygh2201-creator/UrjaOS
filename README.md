@@ -45,8 +45,8 @@ clearly labeled as recommendations/simulations.
 | Solar + consumption forecasting (with MAE/RMSE/MAPE) | ✅ Done |
 | Battery optimization engine (rule-based, constraint-safe) | ✅ Done |
 | AI Energy Copilot (context-grounded, server-side key) | ✅ Done |
-| Alerts + Bill analyzer | ✅ Phase 11 |
-| Reports | ✅ Phase 12 |
+| Alerts + Bill analyzer (solar wastage, import spikes, low battery, comms gaps) | ✅ Done |
+| Reports | ⬜ Phase 12 |
 | Demo mode (Factory Alpha dataset) | ✅ Phase 6 |
 
 ## Architecture

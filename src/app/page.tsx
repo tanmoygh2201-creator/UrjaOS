@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react";
+import { SunBackdrop } from "@/components/landing/sun-backdrop";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -134,9 +135,17 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-1">
+      {/* Full-page 3D backdrop: a fixed layer behind everything (below the
+          sticky header), morphing from sun to moon as the visitor scrolls.
+          Translucent sections reveal it; opaque ones stay fully legible. */}
+      <SunBackdrop />
+
+      {/* Positioned above the fixed backdrop: opaque surfaces cover it,
+          translucent ones reveal it — while text always paints on top. */}
+      <main className="relative z-10 flex-1">
         {/* ── Hero ─────────────────────────────────────────────── */}
-        <section className="border-b border-border/60 bg-gradient-to-b from-secondary/60 to-background">
+        {/* Semi-transparent so the fixed 3D sun glows behind the copy. */}
+        <section className="border-b border-border/60 bg-background/70">
           <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
             <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
@@ -203,7 +212,7 @@ export default function Home() {
         </section>
 
         {/* ── Problem ──────────────────────────────────────────── */}
-        <section className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
+        <section className="mx-auto w-full max-w-6xl bg-background/85 px-4 py-20 sm:px-6">
           <div className="max-w-2xl">
             <h2 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
               Solar energy is variable. Bills are not intuitive.
@@ -272,7 +281,7 @@ export default function Home() {
         </section>
 
         {/* ── Features ─────────────────────────────────────────── */}
-        <section id="features" className="mx-auto w-full max-w-6xl scroll-mt-16 px-4 py-20 sm:px-6">
+        <section id="features" className="mx-auto w-full max-w-6xl scroll-mt-16 bg-background/85 px-4 py-20 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
               One platform for your entire energy system
@@ -359,7 +368,7 @@ export default function Home() {
         </section>
 
         {/* ── AI Copilot ───────────────────────────────────────── */}
-        <section id="copilot" className="mx-auto w-full max-w-6xl scroll-mt-16 px-4 py-20 sm:px-6">
+        <section id="copilot" className="mx-auto w-full max-w-6xl scroll-mt-16 bg-background/85 px-4 py-20 sm:px-6">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <Card className="order-last lg:order-first">
               <CardHeader>
@@ -439,7 +448,7 @@ export default function Home() {
         </section>
 
         {/* ── Final CTA ────────────────────────────────────────── */}
-        <section className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
+        <section className="mx-auto w-full max-w-6xl bg-background/70 px-4 py-20 sm:px-6">
           <Card className="border-primary/20 bg-gradient-to-br from-secondary/70 to-card">
             <CardContent className="flex flex-col items-center gap-6 py-12 text-center">
               <h2 className="max-w-xl text-3xl font-bold tracking-tight text-balance sm:text-4xl">
@@ -466,7 +475,9 @@ export default function Home() {
       </main>
 
       {/* ── Footer ─────────────────────────────────────────────── */}
-      <footer className="border-t border-border/60">
+      {/* Transparent footer: the fixed backdrop shows through here, so the
+          sun→moon morph completes exactly as the visitor reaches the end. */}
+      <footer className="relative z-10 border-t border-border/60 bg-transparent">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:px-6">
           <div className="flex items-center gap-2">
             <span className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">

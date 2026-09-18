@@ -46,7 +46,7 @@ clearly labeled as recommendations/simulations.
 | Battery optimization engine (rule-based, constraint-safe) | ✅ Done |
 | AI Energy Copilot (context-grounded, server-side key) | ✅ Done |
 | Alerts + Bill analyzer (solar wastage, import spikes, low battery, comms gaps) | ✅ Done |
-| Reports | ⬜ Phase 12 |
+| Reports (daily/weekly/monthly summaries, CSV export, print-to-PDF) | ✅ Done |
 | Demo mode (Factory Alpha dataset) | ✅ Phase 6 |
 
 ## Architecture

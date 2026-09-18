@@ -157,14 +157,22 @@ function emptyCell(): HourCell {
 /**
  * Loads and aggregates analytics for a system over the requested range.
  * `hasData` is false when the system has no readings in the window.
+ *
+ * `windowOverride` lets callers (e.g. the reports service) aggregate an
+ * explicit local-day window — such as the previous period — instead of the
+ * range key's default "ending today" window. Aggregation itself is identical.
  */
 export async function getAnalyticsData(
   supabase: SupabaseClient,
   system: EnergySystem,
-  rangeKey: AnalyticsRangeKey
+  rangeKey: AnalyticsRangeKey,
+  windowOverride?: { startDay: Date; days: number }
 ): Promise<AnalyticsData> {
-  const { startDay, days } = resolveRangeWindow(rangeKey);
-  const { fromIso, toIso } = localDayRangeIso(startDay, startOfLocalDay());
+  const { startDay, days } = windowOverride ?? resolveRangeWindow(rangeKey);
+  const endDay = windowOverride
+    ? addDays(startDay, days - 1)
+    : startOfLocalDay();
+  const { fromIso, toIso } = localDayRangeIso(startDay, endDay);
 
   const [solar, consumption, battery, grid] = await Promise.all([
     fetchAllPages<SolarReading>(

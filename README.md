@@ -127,6 +127,10 @@ cp .env.example .env.local    # PowerShell: Copy-Item .env.example .env.local
 | `AI_PROVIDER` | server only | `openai` (default), `groq`, `openrouter`, or `nvidia` (NVIDIA NIM, `nvapi-…` keys) — any OpenAI-compatible endpoint |
 | `AI_MODEL` | server only | Optional model override (e.g. `openai/gpt-oss-20b` on NVIDIA). Defaults per provider; NVIDIA catalog models retire often, so pin one there if needed |
 | `AI_BASE_URL` | server only | Optional endpoint override for any OpenAI-compatible server (vLLM, Ollama, …) |
+| `AI_IMAGE_BASE_URL` | server only | Optional OpenAI-compatible **images** endpoint (e.g. `https://api.openai.com/v1`). Enables raster illustrations for Copilot visual requests |
+| `AI_IMAGE_API_KEY` | **server only** | API key for the images endpoint. Leave both image vars empty to disable raster generation — the Copilot still draws SVG diagrams without them |
+| `AI_IMAGE_MODEL` | server only | Optional raster model override (default `gpt-image-1`) |
+| `AI_IMAGE_SIZE` | server only | Optional raster image size (default `1024x1024`) |
 
 - `.env.local` is git-ignored — never commit secrets.
 - Get the Supabase URL + anon key from **Supabase Dashboard → Project Settings → API**.

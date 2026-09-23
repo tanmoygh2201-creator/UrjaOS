@@ -112,7 +112,7 @@ describe("provider config", () => {
       AI_PROVIDER: "nvidia",
     })!;
     expect(nvidia.baseUrl).toBe("https://integrate.api.nvidia.com/v1");
-    expect(nvidia.model).toBe("openai/gpt-oss-20b");
+    expect(nvidia.model).toBe("nvidia/nemotron-3.5-lightning-30b-a3b");
   });
 
   it("tolerates quoted or padded AI_PROVIDER values", () => {

@@ -57,11 +57,13 @@ const PROVIDER_PRESETS: Record<
   groq: { baseUrl: "https://api.groq.com/openai/v1", model: "llama-3.1-8b-instant" },
   openrouter: { baseUrl: "https://openrouter.ai/api/v1", model: "openai/gpt-4o-mini" },
   // NVIDIA NIM (build.nvidia.com) — `nvapi-…` keys. Catalog models retire
-  // often (llama-3.1-8b died 2026-08-26); the default below is verified
-  // serving, and AI_MODEL overrides it without code changes.
+  // often (llama-3.1-8b died 2026-08-26; openai/gpt-oss-20b stopped serving
+  // 2026-09: requests hang instead of 404ing). The default below was
+  // verified serving (200 in ~6s), and AI_MODEL overrides it without code
+  // changes.
   nvidia: {
     baseUrl: "https://integrate.api.nvidia.com/v1",
-    model: "openai/gpt-oss-20b",
+    model: "nvidia/nemotron-3.5-lightning-30b-a3b",
   },
 };
 
@@ -94,10 +96,10 @@ export function resolveProviderConfig(
     model,
     baseUrl,
     temperature: 0.3,
-    // Generous budget: reasoning-style models (e.g. gpt-oss on NVIDIA NIM)
-    // spend tokens thinking before the visible answer, so a tight cap yields
-    // an empty `content` and an unreadable-response error.
-    maxTokens: 1000,
+    // Generous budget: reasoning-style models (e.g. Nemotron/gpt-oss on
+    // NVIDIA NIM) spend tokens thinking before the visible answer, so a
+    // tight cap yields truncated reasoning with no answer at all.
+    maxTokens: 3000,
   };
 }
 
@@ -148,12 +150,15 @@ export function parseChatResponse(payload: unknown): string {
 
 /**
  * Calls the chat-completions endpoint. Throws ProviderError with a kind the
- * action layer maps to safe UI messages.
+ * action layer maps to safe UI messages. Aborts with a `network` error when
+ * the provider does not answer within `timeoutMs` (default 90s — generous
+ * enough for reasoning-style models that think before answering).
  */
 export async function callChatCompletion(
   config: ProviderConfig,
   messages: ChatMessage[],
-  fetchImpl: typeof fetch = fetch
+  fetchImpl: typeof fetch = fetch,
+  timeoutMs = 90_000
 ): Promise<string> {
   const { url, body, headers } = buildChatRequest(config, messages);
 
@@ -163,6 +168,7 @@ export async function callChatCompletion(
       method: "POST",
       headers,
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(timeoutMs),
     });
   } catch {
     throw new ProviderError("network", "Could not reach the AI service.");

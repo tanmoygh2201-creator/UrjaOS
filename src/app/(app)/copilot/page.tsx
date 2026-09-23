@@ -74,7 +74,8 @@ export default async function CopilotPage({ searchParams }: CopilotPageProps) {
           AI Energy Copilot
         </h1>
         <p className="mt-1 text-muted-foreground">
-          Answers grounded in your system&apos;s own data — never invented.
+          A full AI assistant — general chat plus analysis grounded in your
+          system&apos;s own data, never invented.
         </p>
       </div>
 

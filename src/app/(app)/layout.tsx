@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/dashboard/app-header";
+import { AmbientLayers } from "@/components/motion/ambient-layers";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -34,7 +35,9 @@ export default async function AppLayout({
   const userLabel = profile?.full_name?.trim() || user.email || "Account";
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="relative flex min-h-screen flex-col">
+      {/* Smart-Energy atmosphere behind the whole app shell. */}
+      <AmbientLayers />
       <AppHeader userLabel={userLabel} />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
         {children}

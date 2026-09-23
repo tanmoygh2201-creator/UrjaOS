@@ -4,16 +4,20 @@
  * The 3D hero backdrop scene (loaded client-side only, after hydration).
  *
  * A large rotating sun — an emissive sphere with a canvas-generated bump
- * texture — with corona sprites and floating solar panels. Page scroll
- * progress (0 at the top of the page, 1 at the footer) smoothly morphs it
- * into a moon: a slightly larger "moon shell" sphere with a crater bump
- * texture fades in over the sun while the sun's palette cools and its glow
- * fades — a crossfade of color, emissive glow and surface texture with no
- * custom shaders, so it renders identically on every WebGL implementation.
+ * texture — with corona sprites and floating solar panels. The selected
+ * theme and page scroll smoothly morph it into a moon (dark theme = moon
+ * everywhere; light theme = sun at the hero, moon at the footer): a
+ * crossfade of color, emissive glow and surface texture with no custom
+ * shaders, so it renders identically on every WebGL implementation.
  *
- * Scroll progress is re-read every frame and snapped on the first frame, so
- * reloading partway down the page resumes at the correct morph state instead
- * of replaying from "sun".
+ * The selected theme drives the morph alongside scroll: in the dark theme the
+ * moon is shown everywhere from the very first frame, while in the light
+ * theme page scroll progress (0 at the top of the page, 1 at the footer)
+ * smoothly morphs the sun into the moon exactly as before. The morph target
+ * is re-read every frame and snapped on the first frame, so reloading
+ * partway down the page — in either theme — resumes at the correct state
+ * instead of replaying from "sun". Flipping the theme cross-fades the body,
+ * glow and palette over ~0.4s, matching the CSS token transition.
  *
  * React Compiler notes: every object mutated per-frame is reached through a
  * ref deref inside the frame callback (never a render-scope local or a
@@ -178,7 +182,11 @@ function makeMoonCraterTexture(): THREE.CanvasTexture {
 
 function Rig() {
   // Per-frame-mutated objects live in refs, reached only via ref.current.
-  const smooth = useRef({ t: 0, morph: -1 });
+  // `light` eases toward 1 when the site is in the light theme so the sun
+  // reads as a calm daytime disc (softer corona, brighter ambient) instead
+  // of the deep-energy dark-theme glow. The scene morph also follows the
+  // theme (dark = moon everywhere) — see the frame loop below.
+  const smooth = useRef({ t: 0, morph: -1, light: 0 });
 
   const haloTex = useMemo(() => makeHaloTexture(), []);
   const panelTex = useMemo(() => makePanelTexture(), []);
@@ -216,19 +224,28 @@ function Rig() {
   const narrowTarget = useMemo(() => new THREE.Vector3(0, 2.9, -1), []);
   const size = useThree((s) => s.size);
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     const d = Math.min(delta, 0.05);
     smooth.current.t += d;
 
-    // Scroll progress → morph target. Snapped on the very first frame so a
-    // mid-page reload resumes at the correct state instead of replaying.
+    // Morph target: the theme's sky (dark theme shows the moon everywhere,
+    // from the very first frame) further driven by scroll in the light theme
+    // (sun at the hero → moon at the footer). Snapped on the first frame so
+    // a mid-page reload — in either theme — resumes at the correct state
+    // instead of replaying from "sun".
+    const dark = document.documentElement.classList.contains("dark");
     const doc = document.documentElement;
     const max = Math.max(1, doc.scrollHeight - window.innerHeight);
-    const target = Math.min(1, Math.max(0, (window.scrollY || 0) / max));
+    const scrollM = Math.min(1, Math.max(0, (window.scrollY || 0) / max));
+    const target = dark ? 1 : scrollM;
     if (smooth.current.morph < 0) smooth.current.morph = target;
     smooth.current.morph += (target - smooth.current.morph) * Math.min(1, d * 6);
     if (Math.abs(target - smooth.current.morph) < 0.0005) smooth.current.morph = target;
     const m = smooth.current.morph;
+
+    // Ease the theme factor (0 = dark, 1 = light) toward the live class.
+    smooth.current.light += ((dark ? 0 : 1) - smooth.current.light) * Math.min(1, d * 4);
+    const light = smooth.current.light;
 
     // Continuous rotation of the whole sun/moon body (corona sprites are
     // rotation-independent by nature).
@@ -242,23 +259,30 @@ function Rig() {
     }
     if (coronaInMat.current) {
       coronaInMat.current.color.lerpColors(DAY.coronaIn, NIGHT.coronaIn, m);
-      coronaInMat.current.opacity = 0.5 - 0.22 * m;
+      coronaInMat.current.opacity = (0.5 - 0.22 * m) * (1 - 0.35 * light);
     }
     if (coronaOutMat.current) {
       coronaOutMat.current.color.lerpColors(DAY.coronaOut, NIGHT.coronaOut, m);
-      coronaOutMat.current.opacity = 0.3 - 0.1 * m;
+      coronaOutMat.current.opacity = (0.3 - 0.1 * m) * (1 - 0.35 * light);
     }
     if (dirLight.current) {
       dirLight.current.color.lerpColors(DAY.light, NIGHT.light, m);
-      dirLight.current.intensity = 1.15 - 0.55 * m;
+      dirLight.current.intensity = 1.15 - 0.55 * m + 0.2 * light;
     }
-    if (ambLight.current) ambLight.current.intensity = 0.85 - 0.3 * m;
+    if (ambLight.current) ambLight.current.intensity = 0.85 - 0.3 * m + 0.35 * light;
 
     // Panels bob gently on their own phase.
     panelRefs.current.forEach((g, i) => {
       if (!g) return;
       g.position.y = PANELS[i].pos[1] + Math.sin(smooth.current.t * 0.55 + i * 1.7) * 0.1;
     });
+
+    // Expose the morph state on the canvas for debugging and tests — writes
+    // only when the 0.05-step-rounded value changes, so steady-state cost
+    // is zero.
+    const canvasEl = state.gl.domElement as HTMLCanvasElement;
+    const step = (Math.round(m * 20) / 20).toFixed(2);
+    if (canvasEl.dataset.morph !== step) canvasEl.dataset.morph = step;
 
     // Responsive placement + panel compaction on narrow screens.
     const narrow = size.width < 640 || size.width / Math.max(1, size.height) < 0.9;

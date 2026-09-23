@@ -304,12 +304,59 @@ Commit style follows the build order of the project (e.g. `Add authentication`,
 
 ## Deployment (Vercel + Supabase)
 
-1. Push the repository to GitHub.
-2. In Vercel, **Import Project** and select the repository.
-3. Add the environment variables from `.env.example` in **Settings → Environment Variables**.
-4. Deploy. Then in Supabase → **Authentication → URL Configuration**, add
-   `https://<your-app>.vercel.app/**` as a redirect URL.
-5. Verify: register/login, dashboard, forecast, optimization, AI Copilot.
+### 1. Push to GitHub
+
+```bash
+git remote add origin https://github.com/<you>/urjaos.git
+git push -u origin master
+```
+
+`.env.local` is git-ignored — secrets never leave your machine.
+
+### 2. Import into Vercel
+
+At [vercel.com/new](https://vercel.com/new), import the repository. Framework
+Preset detects **Next.js automatically** — no build settings to change.
+
+### 3. Environment variables
+
+In **Settings → Environment Variables**, add (values from your local
+`.env.local`):
+
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | Same as local |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Safe to expose — RLS protects the data |
+| `AI_PROVIDER` | ✅ | e.g. `nvidia` |
+| `AI_API_KEY` | ✅ | Server-side only — never sent to the browser |
+| `AI_MODEL`, `AI_BASE_URL` | — | Optional overrides |
+| `AI_IMAGE_*` | — | Optional raster-image generation for Copilot visuals |
+
+Then **Deploy**.
+
+### 4. Point Supabase at the new domain
+
+In Supabase → **Authentication → URL Configuration**:
+
+- **Site URL** → `https://<your-app>.vercel.app`
+- **Redirect URLs** → add `https://<your-app>.vercel.app/**`
+
+Without this, sign-in works but confirmation links and auth redirects bounce
+back to localhost.
+
+### 5. Database
+
+If you set up Supabase from `supabase-setup.sql` **before** the reading-table
+UPDATE policies were added, run
+`supabase/migrations/20260920000000_reading_update_policies.sql` in the SQL
+editor (fresh setups from the bundle already include it).
+
+### 6. Verify
+
+Register → dashboard → create a system → generate demo data → analytics →
+forecast → optimization → AI Copilot. On the free plan, Supabase's built-in
+email rate limit is tight in production — consider a custom SMTP provider in
+**Project Settings → Auth → SMTP** if confirmation mails don't arrive.
 
 ## Security Notes
 

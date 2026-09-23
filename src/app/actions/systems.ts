@@ -96,6 +96,7 @@ export async function createSystemAction(
             rate: formData.get("tariffRate"),
           }
         : { type: "tou", currency: formData.get("currency"), periods },
+    currency: formData.get("currency"),
   });
 
   if (!validated.ok) {
@@ -170,6 +171,7 @@ export async function updateSystemAction(
             rate: formData.get("tariffRate"),
           }
         : { type: "tou", currency: formData.get("currency"), periods },
+    currency: formData.get("currency"),
   });
 
   if (!validated.ok) {

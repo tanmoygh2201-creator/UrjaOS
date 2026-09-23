@@ -70,8 +70,10 @@ export function KpiCards({ kpis, currency }: KpiCardsProps) {
       {cards.map((card) => (
         <Card key={card.key}>
           <CardContent className="space-y-1.5">
-            <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-              <card.icon className={`size-4 ${card.tone}`} aria-hidden="true" />
+            <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+              <span className={`flex size-6 items-center justify-center rounded-md bg-muted ${card.tone}`}>
+                <card.icon className="size-3.5" aria-hidden="true" />
+              </span>
               {card.label}
             </p>
             <p className="text-2xl font-bold tabular-nums tracking-tight">

@@ -49,82 +49,118 @@
 }
 
 /*
- * UrjaOS design tokens — CleanTech identity.
- * Primary: deep solar green (trust + sustainability)
- * Accent: energy amber (solar / action highlights)
+ * UrjaOS — "Smart Energy OS" visual identity (light + dark).
+ *
+ * The site defaults to LIGHT; the deep-energy dark theme is applied by a
+ * `.dark` class on <html> (persisted in localStorage, set pre-paint by an
+ * inline script in the root layout so there is no flash).
+ *
+ *   solar gold   → primary / actions / solar data
+ *   electric cyan→ ring / focus / consumption + grid data
+ *   battery green→ storage / success states
+ *
+ * All components consume these tokens, so re-valuing this block reskins the
+ * entire product. Chart colors stay ≥ L 0.68 in dark; light-theme values are
+ * tuned so foreground ≥ 7:1 and muted-foreground ≥ 4.5:1 on background.
  */
 :root {
-  --background: oklch(0.985 0.003 120);
-  --foreground: oklch(0.17 0.015 150);
+  color-scheme: light;
+  --background: oklch(0.988 0.006 95);
+  --foreground: oklch(0.2 0.03 255);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.17 0.015 150);
+  --card-foreground: oklch(0.2 0.03 255);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.17 0.015 150);
-  --primary: oklch(0.46 0.1 152);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.955 0.012 140);
-  --secondary-foreground: oklch(0.28 0.05 152);
-  --muted: oklch(0.955 0.006 130);
-  --muted-foreground: oklch(0.52 0.02 150);
-  --accent: oklch(0.955 0.012 140);
-  --accent-foreground: oklch(0.28 0.05 152);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.91 0.008 140);
-  --input: oklch(0.91 0.008 140);
-  --ring: oklch(0.55 0.09 152);
+  --popover-foreground: oklch(0.2 0.03 255);
+  --primary: oklch(0.72 0.16 75);
+  --primary-foreground: oklch(0.99 0.005 100);
+  --secondary: oklch(0.955 0.012 95);
+  --secondary-foreground: oklch(0.28 0.035 255);
+  --muted: oklch(0.955 0.012 95);
+  --muted-foreground: oklch(0.47 0.028 250);
+  --accent: oklch(0.94 0.02 210);
+  --accent-foreground: oklch(0.3 0.04 250);
+  --destructive: oklch(0.55 0.21 25);
+  --border: oklch(0.2 0.03 255 / 12%);
+  --input: oklch(0.2 0.03 255 / 16%);
+  --ring: oklch(0.62 0.13 215);
   /* Energy chart palette: solar, consumption, battery, grid, forecast */
-  --chart-1: oklch(0.72 0.16 80);
-  --chart-2: oklch(0.46 0.1 152);
-  --chart-3: oklch(0.62 0.15 220);
-  --chart-4: oklch(0.55 0.05 260);
-  --chart-5: oklch(0.68 0.14 140);
+  --chart-1: oklch(0.72 0.16 75);
+  --chart-2: oklch(0.6 0.13 160);
+  --chart-3: oklch(0.6 0.12 230);
+  --chart-4: oklch(0.52 0.12 290);
+  --chart-5: oklch(0.62 0.14 135);
   --radius: 0.625rem;
-  --sidebar: oklch(0.98 0.005 140);
-  --sidebar-foreground: oklch(0.17 0.015 150);
-  --sidebar-primary: oklch(0.46 0.1 152);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.955 0.012 140);
-  --sidebar-accent-foreground: oklch(0.28 0.05 152);
-  --sidebar-border: oklch(0.91 0.008 140);
-  --sidebar-ring: oklch(0.55 0.09 152);
-  /* UrjaOS brand extras */
-  --color-energy-amber: oklch(0.72 0.16 80);
-  --color-energy-green: oklch(0.46 0.1 152);
-  --color-energy-blue: oklch(0.62 0.15 220);
+  --sidebar: oklch(0.975 0.008 95);
+  --sidebar-foreground: oklch(0.2 0.03 255);
+  --sidebar-primary: oklch(0.72 0.16 75);
+  --sidebar-primary-foreground: oklch(0.99 0.005 100);
+  --sidebar-accent: oklch(0.94 0.02 210);
+  --sidebar-accent-foreground: oklch(0.3 0.04 250);
+  --sidebar-border: oklch(0.2 0.03 255 / 10%);
+  --sidebar-ring: oklch(0.62 0.13 215);
+  /* UrjaOS brand extras (richer variants for light surfaces) */
+  --color-energy-amber: oklch(0.72 0.16 70);
+  --color-energy-green: oklch(0.58 0.14 155);
+  --color-energy-blue: oklch(0.58 0.13 235);
 }
 
 .dark {
-  --background: oklch(0.16 0.01 160);
-  --foreground: oklch(0.97 0.005 140);
-  --card: oklch(0.21 0.012 160);
-  --card-foreground: oklch(0.97 0.005 140);
-  --popover: oklch(0.21 0.012 160);
-  --popover-foreground: oklch(0.97 0.005 140);
-  --primary: oklch(0.75 0.13 155);
-  --primary-foreground: oklch(0.18 0.03 155);
-  --secondary: oklch(0.27 0.02 155);
-  --secondary-foreground: oklch(0.97 0.005 140);
-  --muted: oklch(0.27 0.015 155);
-  --muted-foreground: oklch(0.71 0.02 150);
-  --accent: oklch(0.27 0.02 155);
-  --accent-foreground: oklch(0.97 0.005 140);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.6 0.08 152);
-  --chart-1: oklch(0.78 0.15 80);
-  --chart-2: oklch(0.75 0.13 155);
-  --chart-3: oklch(0.72 0.13 220);
-  --chart-4: oklch(0.65 0.08 260);
-  --chart-5: oklch(0.72 0.13 140);
-  --sidebar: oklch(0.19 0.012 160);
-  --sidebar-foreground: oklch(0.97 0.005 140);
-  --sidebar-primary: oklch(0.75 0.13 155);
-  --sidebar-primary-foreground: oklch(0.18 0.03 155);
-  --sidebar-accent: oklch(0.27 0.02 155);
-  --sidebar-accent-foreground: oklch(0.97 0.005 140);
+  color-scheme: dark;
+  --background: oklch(0.145 0.025 250);
+  --foreground: oklch(0.97 0.005 100);
+  --card: oklch(0.19 0.03 252);
+  --card-foreground: oklch(0.97 0.005 100);
+  --popover: oklch(0.185 0.028 252);
+  --popover-foreground: oklch(0.97 0.005 100);
+  --primary: oklch(0.82 0.16 85);
+  --primary-foreground: oklch(0.17 0.04 250);
+  --secondary: oklch(0.255 0.035 250);
+  --secondary-foreground: oklch(0.95 0.01 100);
+  --muted: oklch(0.22 0.028 250);
+  --muted-foreground: oklch(0.71 0.025 245);
+  --accent: oklch(0.26 0.045 235);
+  --accent-foreground: oklch(0.95 0.01 100);
+  --destructive: oklch(0.68 0.19 25);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.78 0.13 200);
+  --chart-1: oklch(0.8 0.16 85);
+  --chart-2: oklch(0.72 0.14 160);
+  --chart-3: oklch(0.74 0.13 205);
+  --chart-4: oklch(0.66 0.1 290);
+  --chart-5: oklch(0.76 0.14 135);
+  --sidebar: oklch(0.165 0.028 252);
+  --sidebar-foreground: oklch(0.97 0.005 100);
+  --sidebar-primary: oklch(0.82 0.16 85);
+  --sidebar-primary-foreground: oklch(0.17 0.04 250);
+  --sidebar-accent: oklch(0.26 0.045 235);
+  --sidebar-accent-foreground: oklch(0.95 0.01 100);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.6 0.08 152);
+  --sidebar-ring: oklch(0.78 0.13 200);
+  --color-energy-amber: oklch(0.8 0.16 85);
+  --color-energy-green: oklch(0.75 0.15 155);
+  --color-energy-blue: oklch(0.74 0.13 205);
+}
+
+/*
+ * Smooth theme transition.
+ *
+ * Applied to <html> only while the theme flips (added/removed by the
+ * toggle), so every token-consuming surface cross-fades instead of
+ * snapping — and normal interactions keep their snappy transitions.
+ */
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition:
+    background-color 420ms ease,
+    border-color 420ms ease,
+    color 320ms ease,
+    fill 320ms ease,
+    stroke 320ms ease,
+    box-shadow 420ms ease !important;
+  transition-delay: 0ms !important;
 }
 
 @layer base {
@@ -136,6 +172,290 @@
   }
   html {
     @apply font-sans;
+  }
+  ::selection {
+    background: oklch(0.82 0.16 85 / 0.32);
+  }
+  /* Light theme needs a stronger selection tint to stay visible. */
+  :root:not(.dark) ::selection {
+    background: oklch(0.72 0.16 75 / 0.28);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * UrjaOS motion & atmosphere primitives
+ * Every effect animates only transform/opacity (compositor-friendly), is
+ * purely decorative, and is disabled by the global prefers-reduced-motion
+ * override at the bottom of this file.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+/* Slow ambient energy wash: solar gold above the horizon, electric cyan
+   rising from below. Fixed so it holds while scrolling. Softened in the
+   light theme where a bright ambient wash would wash out text. */
+.urja-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      60rem 42rem at 85% -12%,
+      oklch(0.55 0.14 80 / 0.14),
+      transparent 62%
+    ),
+    radial-gradient(
+      52rem 38rem at -12% 112%,
+      oklch(0.6 0.14 210 / 0.13),
+      transparent 62%
+    ),
+    radial-gradient(
+      42rem 30rem at 50% 124%,
+      oklch(0.55 0.12 160 / 0.07),
+      transparent 62%
+    );
+  animation: urja-breath 28s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+:root:not(.dark) .urja-ambient {
+  background:
+    radial-gradient(
+      60rem 42rem at 85% -12%,
+      oklch(0.55 0.14 80 / 0.09),
+      transparent 62%
+    ),
+    radial-gradient(
+      52rem 38rem at -12% 112%,
+      oklch(0.6 0.14 210 / 0.08),
+      transparent 62%
+    ),
+    radial-gradient(
+      42rem 30rem at 50% 124%,
+      oklch(0.55 0.12 160 / 0.05),
+      transparent 62%
+    );
+}
+
+/* Faint circuit-grid texture fading out below the first screens. Inverted
+   for the light theme (dark lines on a light ground). */
+.urja-grid-pattern {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  background-image: linear-gradient(
+      oklch(1 0 0 / 0.04) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, oklch(1 0 0 / 0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(
+    ellipse 95% 75% at 50% 0%,
+    black 25%,
+    transparent 78%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 95% 75% at 50% 0%,
+    black 25%,
+    transparent 78%
+  );
+}
+:root:not(.dark) .urja-grid-pattern {
+  background-image: linear-gradient(
+      oklch(0.2 0.03 255 / 0.07) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, oklch(0.2 0.03 255 / 0.07) 1px, transparent 1px);
+}
+
+/* Scroll reveal — CSS scroll-driven animations where supported (zero JS,
+   zero layout shift); static content everywhere else. Stagger with
+   `animation-delay` via the --urja-delay custom property. */
+@supports (animation-timeline: view()) {
+  .urja-reveal {
+    animation: urja-reveal-in linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 55%;
+    animation-delay: var(--urja-delay, 0ms);
+  }
+  /* Scroll-driven animations ignore animation-duration (the timeline
+     drives progress), so reduced motion needs its own kill switch. */
+  @media (prefers-reduced-motion: reduce) {
+    .urja-reveal {
+      animation: none;
+    }
+  }
+}
+@keyframes urja-reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Ambient background breathing (opacity + scale drift only). */
+@keyframes urja-breath {
+  from {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+/* Floating depth orbs (hero decoration). */
+.urja-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(64px);
+  opacity: 0.45;
+  animation: urja-float 14s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes urja-float {
+  from {
+    transform: translate3d(0, -14px, 0);
+  }
+  to {
+    transform: translate3d(18px, 16px, 0);
+  }
+}
+
+/* Rising solar-energy particles (pure decoration, transform/opacity only). */
+.urja-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.urja-particles i {
+  position: absolute;
+  bottom: -10%;
+  display: block;
+  width: var(--urja-size, 6px);
+  height: var(--urja-size, 6px);
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    oklch(0.87 0.15 88 / 0.95),
+    oklch(0.8 0.13 88 / 0)
+  );
+  filter: blur(0.5px);
+  opacity: 0;
+  animation: urja-rise linear infinite;
+  animation-duration: var(--urja-duration, 11s);
+  animation-delay: var(--urja-delay, 0s);
+  will-change: transform, opacity;
+}
+:root:not(.dark) .urja-particles i {
+  background: radial-gradient(
+    circle,
+    oklch(0.62 0.15 75 / 0.95),
+    oklch(0.72 0.16 75 / 0)
+  );
+}
+@keyframes urja-rise {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.6);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.9;
+  }
+  75% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translate3d(2.5vw, -74vh, 0) scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* Light sweep across a highlighted surface (hero badge, primary panels). */
+.urja-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.urja-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 42%,
+    oklch(1 0 0 / 0.16) 50%,
+    transparent 58%
+  );
+  transform: translateX(-130%);
+  animation: urja-sheen-sweep 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes urja-sheen-sweep {
+  0%,
+  58% {
+    transform: translateX(-130%);
+  }
+  86%,
+  100% {
+    transform: translateX(130%);
+  }
+}
+
+/* Signature gradient for hero/key words: gold → electric cyan. */
+.urja-text-gradient {
+  background: linear-gradient(
+    94deg,
+    oklch(0.85 0.15 88),
+    oklch(0.78 0.13 205)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+:root:not(.dark) .urja-text-gradient {
+  background: linear-gradient(
+    94deg,
+    oklch(0.55 0.15 60),
+    oklch(0.55 0.13 230)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Interactive-card behavior, applied globally through the shadcn card slot.
+   Disabled on touch (no hover concept) and in print. */
+@media (hover: hover) {
+  [data-slot="card"] {
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
+  }
+  [data-slot="card"]:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 14px 34px -14px oklch(0.55 0.1 80 / 0.3),
+      0 0 0 1px oklch(0.82 0.16 85 / 0.14);
+  }
+  :root:not(.dark) [data-slot="card"]:hover {
+    box-shadow:
+      0 14px 34px -14px oklch(0.45 0.1 75 / 0.22),
+      0 0 0 1px oklch(0.72 0.16 75 / 0.2);
+  }
+  [data-slot="card"]:active {
+    transform: translateY(0);
+  }
+}
+@media print {
+  [data-slot="card"]:hover {
+    transform: none;
+    box-shadow: none;
   }
 }
 
@@ -156,8 +476,18 @@
     stroke-dashoffset: 0;
   }
 }
+
+/* ── Accessibility: global reduced-motion switch ─────────────────────────
+ * Any decorative animation or transition collapses to its end state; the
+ * scroll-reveal @supports block inherits this too (0.01ms = instant).
+ */
 @media (prefers-reduced-motion: reduce) {
-  .urja-flow-active {
-    animation: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

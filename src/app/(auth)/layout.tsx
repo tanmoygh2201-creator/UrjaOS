@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { AuthHeader } from "@/components/auth/auth-header";
+import { AmbientLayers } from "@/components/motion/ambient-layers";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -22,6 +23,11 @@ export default async function AuthLayout({
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-secondary/50 to-background px-4 py-16">
+      {/* Same Smart-Energy atmosphere, softened behind the auth card. */}
+      <div aria-hidden="true" className="opacity-60">
+        <AmbientLayers />
+        <div className="urja-grid-pattern" />
+      </div>
       <AuthHeader />
       {children}
     </div>
